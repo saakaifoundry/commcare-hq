@@ -2,7 +2,7 @@ import uuid
 
 from django.conf import settings
 from django.core.management import call_command
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from elasticsearch.exceptions import ConnectionError
 
 from corehq.apps.case_search.models import CaseSearchConfig
@@ -44,6 +44,7 @@ class PillowtopReindexerTest(TestCase):
             ensure_index_deleted(index)
         super(PillowtopReindexerTest, cls).tearDownClass()
 
+    @override_settings(TESTS_SHOULD_USE_SQL_BACKEND=False)
     def test_domain_reindexer(self):
         delete_all_domains()
         ensure_index_deleted(DOMAIN_INDEX)
@@ -57,6 +58,7 @@ class PillowtopReindexerTest(TestCase):
         self.assertEqual('Domain', domain_doc['doc_type'])
         delete_es_index(DOMAIN_INDEX)
 
+    @override_settings(TESTS_SHOULD_USE_SQL_BACKEND=False)
     def test_case_reindexer(self):
         FormProcessorTestUtils.delete_all_cases()
         case = _create_and_save_a_case()
@@ -95,6 +97,7 @@ class PillowtopReindexerTest(TestCase):
         es.indices.refresh(CASE_SEARCH_INDEX)  # as well as refresh the index
         self._assert_case_is_in_es(case, esquery=CaseSearchES())
 
+    @override_settings(TESTS_SHOULD_USE_SQL_BACKEND=False)
     def test_xform_reindexer(self):
         FormProcessorTestUtils.delete_all_xforms()
         form = create_and_save_a_form(DOMAIN)

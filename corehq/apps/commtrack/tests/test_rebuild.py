@@ -1,6 +1,7 @@
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from casexml.apps.case.cleanup import rebuild_case_from_forms
 from casexml.apps.case.mock import CaseFactory
+
 from corehq.apps.commtrack.helpers import make_product
 from corehq.apps.commtrack.processing import rebuild_stock_state
 from corehq.apps.commtrack.tests.util import get_single_balance_block
@@ -71,6 +72,7 @@ class RebuildStockStateTest(TestCase):
 
         self._assert_stats(2, 200, 200)
 
+    @override_settings(TESTS_SHOULD_USE_SQL_BACKEND=False)
     def test_inferred(self):
         self._submit_ledgers(LEDGER_BLOCKS_INFERRED)
         # this is weird behavior:
